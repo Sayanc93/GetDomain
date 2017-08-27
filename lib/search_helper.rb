@@ -15,7 +15,7 @@ module SearchHelper
   # num => number of results to fetch
   #
   def make_request_and_fetch_domain(name = "")
-    name = name.chomp.gsub(/\s+/, '')
+    name = name.chomp.gsub(/\s+/, '').downcase
     query_params = { key: GOOGLE_API_KEY, q: name, num: 7, safe: "high", cx: GOOGLE_CUSTOM_SEARCH_ID }
 
     response = HTTParty.get(GOOGLE_SEARCH_API, query: query_params)
@@ -27,11 +27,13 @@ module SearchHelper
   # We have chosen 7 as the default number of results to fetch from the API
   # because in some cases News articles take precedence when the brand name is colloquial.
   # We usually return the first link but in those rare cases, we have to parse through
-  # first few links before we stumble upon the correct domain.
+  # first few items before we stumble upon the correct domain.
   #
   def format_google_response(name, response_body = {})
     response = JSON(response_body)
-    return response["items"].first["link"] if response["items"].first["displayLink"].include?(name.downcase)
+
+    return response["items"].first["link"] if response["items"].first["displayLink"].include?(name)
+
     response = response["items"].find do |item|
                 item["link"] if item["displayLink"].include?(name)
                end
@@ -46,7 +48,7 @@ module SearchHelper
   #
   def fallback_to_clearbit_api(name = "")
     response = HTTParty.get(CLEARBIT_AUTOCOMPLETE_API, query: { query: name })
-
-    response.success? && !response.empty? ? response.first["domain"] : "Could not find domain."
+    info = JSON(response.body)
+    response.success? && !info.empty? ? info.first["domain"] : "Could not find domain."
   end
 end
