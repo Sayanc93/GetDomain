@@ -7,6 +7,7 @@ require_relative "lib/search_helper"
 module DomainSearch
   class GetDomain < Thor
     namespace :get_domain
+
     include SearchHelper
 
     VERSION = "0.0.1".freeze

@@ -1,4 +1,6 @@
-# GetDomain CLI
+# GetDomain CLI [![Code Climate](https://codeclimate.com/github/Sayanc93/GetDomain/badges/gpa.svg)](https://codeclimate.com/github/Sayanc93/GetDomain)
+
+A Simple Ruby CLI built on top of Thor to fetch domains accurately from company names.
 
 ## Tools Used:
 
@@ -8,6 +10,10 @@
 * **Thor**: Thor is a simple and efficient tool for building self-documenting command line utilities
 
     Run `gem install thor` to install it before running the tool.
+
+* **HTTParty**: HTTparty is a simple and efficient tool to handle HTTP requests.
+
+    Run `gem install httparty` to install it before running the tool.
 
 * **Rspec (optional)**: Behaviour Driven Development for Ruby. It is only needed if you wish to the run the tests.
 
@@ -21,7 +27,7 @@
 
 There are two ways to execute the program:
 
-* Execute `ruby get_domain.rb` or `./get_domain.rb -f file_inputs.txt`; if the file is denied permission for the latter, grant permission by executing `chmod +x get_domain.rb`
+* Execute `ruby get_domain.rb` or `./get_domain.rb`; if the file is denied permission for the latter, grant permission by executing `chmod +x get_domain.rb`
 
 ## Inputs:
 
@@ -32,9 +38,9 @@ commands can be typed in.
 
 2) It accepts company names as arguments and outputs the resultant domain names on the terminal. Company name should not have spaces between them. 
 
-    Split an Atom => invalid
-    
-    SplitanAtom => valid
+    Split an Atom => `invalid`
+
+    SplitanAtom => `valid`
 
 ![Terminal command](https://monosnap.com/file/vNfzFoVp4KKn7Qxflgk4Nk8hvdDgnY.png)
 

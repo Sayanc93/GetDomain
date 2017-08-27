@@ -35,7 +35,7 @@ module SearchHelper
     return response["items"].first["link"] if response["items"].first["displayLink"].include?(name)
 
     response = response["items"].find do |item|
-                item["link"] if item["displayLink"].include?(name)
+                 item["link"] if item["displayLink"].include?(name)
                end
     response["link"]
   end
