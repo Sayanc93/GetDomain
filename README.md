@@ -28,17 +28,18 @@ There are two ways to execute the program:
 1) It provides an interactive command prompt based shell where
 commands can be typed in.
 
-![List commands](https://monosnap.com/file/hoC8RTUFyhDlcPCbMMg1fSL9hYWfw1)
+![List commands](https://monosnap.com/file/hoC8RTUFyhDlcPCbMMg1fSL9hYWfw1.png)
 
 2) It accepts company names as arguments and outputs the resultant domain names on the terminal. Company name should not have spaces between them. 
 
     Split an Atom => invalid
+    
     SplitanAtom => valid
 
-![Terminal command](https://monosnap.com/file/vNfzFoVp4KKn7Qxflgk4Nk8hvdDgnY)
+![Terminal command](https://monosnap.com/file/vNfzFoVp4KKn7Qxflgk4Nk8hvdDgnY.png)
 
 3) Use `help` to explore further on the options of a command. `get_domain_name` also takes `File` as parameter to parse through it and output domains.
 
-![File option](https://monosnap.com/file/eUA9weqlJG5MdhLenkFoeXn7WMcsJB)
+![File option](https://monosnap.com/file/eUA9weqlJG5MdhLenkFoeXn7WMcsJB.png)
 
-![File option usage](https://monosnap.com/file/J3isNmbtE1juZuPTHVODS8BzoO62Fx)
+![File option usage](https://monosnap.com/file/J3isNmbtE1juZuPTHVODS8BzoO62Fx.png)
