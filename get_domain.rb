@@ -10,7 +10,7 @@ module DomainSearch
 
     include SearchHelper
 
-    VERSION = "0.0.1".freeze
+    VERSION = "0.0.2".freeze
 
     # Print current version of the CLI tool.
     # Map --version and -v to print_version without exposing the method.
@@ -33,11 +33,13 @@ module DomainSearch
       With -f or --file option, get_domain:from_company_name -f <file_path> parses company
       names from the file and fetch/display domains of respective companies.
     LONGDESC
-    option :file, :aliases => "-f", :desc => "Read company names from the file and fetch/display their respective domains."
+    option :file, type: :string, :aliases => "-f", :desc => "Read company names from the file and fetch/display their respective domains."
+    option :category, type: :array, :aliases => "-c", :desc => "Company category of the company to be searched on. Eg: 'Recruiting', 'Startups', etc."
     def from_company_name(*names)
       handle_inputs_from_file(options[:file]) if options[:file]
       company_names = *names
-      handle_inputs_from_terminal(company_names)
+      categories = options[:category] ? options[:category] : ["internet", "web", "services"]
+      handle_inputs_from_terminal(company_names, categories)
     end
 
     private
@@ -54,28 +56,57 @@ module DomainSearch
       #
       def handle_inputs_from_file file_path
         File.open(file_path) do |file|
-          file.lazy.each_slice(500) do |company_names|
-            print_domain_names(company_names)
+          file.lazy.each_slice(500) do |input_lines|
+            input_lines = input_lines.delete_if { |line| line == "\n" } # There can be empty lines
+            iterate_over_lines_and_fetch_domain(input_lines)
           end
         end
+      end
+
+      def iterate_over_lines_and_fetch_domain(input_lines)
+        input_lines.each do |input_line|
+          handle_each_company_with_separate_category(input_line)
+        end
+      end
+
+      def handle_each_company_with_separate_category(input_line)
+        input = input_line.chomp.split(" ")
+        search_term = input[0]
+        categories = input[1..-1]
+        company_objects = make_request_and_fetch_domain(search_term, categories)
+        sort_and_print_results(search_term, company_objects)
       end
 
       # Parse company name arguments upto 20 through terminal.
       # Suggest the User to pass file as argument and make them aware of -f or --file
       # option.
       #
-      def handle_inputs_from_terminal(company_names)
+      def handle_inputs_from_terminal(company_names, categories)
         return suggest_file_input_for_more_inputs if company_names.size > 20
-        print_domain_names(company_names)
+        print_domain_names(company_names, categories)
       end
 
       # Process array of company names as input and yield result to STDOUT.
       #
-      def print_domain_names(company_names)
+      def print_domain_names(company_names, categories)
         company_names.each do |name|
-          domain_name = make_request_and_fetch_domain(name)
-          puts domain_name
+          company_objects = make_request_and_fetch_domain(name, categories)
+          sort_and_print_results(name, company_objects)
         end
+      end
+
+      # We sort the company information according to the average of jaccard_index
+      # and percent difference we calculate through Levenstein Distance.
+      #
+      def sort_and_print_results(search_term, company_objects)
+        sorted_companies = company_objects.sort_by do |company|
+                             (company.jaccard_index + company.percent_difference) / 2.0
+                           end
+        puts "'#{search_term}' results :"
+        sorted_companies.each do |company|
+          puts "Name: #{company.name}, Domain: #{company.fetched_domain}, Jaccard_index: #{company.jaccard_index}, Levenstein Distance: #{company.levenstein_distance}"
+        end
+        puts "=========================="
       end
 
       def suggest_file_input_for_more_inputs

@@ -11,6 +11,10 @@ A Simple Ruby CLI built on top of Thor to fetch domains accurately from company 
 
     Run `gem install thor` to install it before running the tool.
 
+* **Parallel**: Parallel processing made simple and fast
+
+    Run `gem install parallel` to install it before running the tool.
+
 * **HTTParty**: HTTparty is a simple and efficient tool to handle HTTP requests.
 
     Run `gem install httparty` to install it before running the tool.
@@ -34,15 +38,23 @@ There are two ways to execute the program:
 1) It provides an interactive command prompt based shell where
 commands can be typed in.
 
-![List commands](https://monosnap.com/file/hoC8RTUFyhDlcPCbMMg1fSL9hYWfw1.png)
+![List commands](https://monosnap.com/file/XCq84SBK5OHoqCr2biYNi3YNf2q5xW.png)
 
-2) It accepts company names as arguments and outputs the resultant domain names on the terminal. Company name should not have spaces between them. 
+2) It accepts company names as arguments and outputs the resultant domain names on the terminal. Company name should not have spaces between them.
 
     Split an Atom => `invalid`
 
     SplitanAtom => `valid`
 
-![Terminal command](https://monosnap.com/file/vNfzFoVp4KKn7Qxflgk4Nk8hvdDgnY.png)
+```ruby
+./get_domain.rb from_company_name Guru -c startups saas 
+```
+![Terminal command](https://monosnap.com/file/HCMlSGHQPTHY68j8ZXWOEDE8WUWz9Y.png)
+
+# Note: 
+`./get_domain.rb from_company_name Guru Microsoft -c startups saas ` yields both companies with similarity index based on the common categories provided.
+However, if you want different category search for each company name. Use the file input.
+First argument `company name` and rest of the arguments can be `categories`
 
 3) Use `help` to explore further on the options of a command. `get_domain_name` also takes `File` as parameter to parse through it and output domains.
 
