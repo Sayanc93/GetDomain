@@ -49,15 +49,15 @@ commands can be typed in.
 ```ruby
 ./get_domain.rb from_company_name Guru -c startups saas 
 ```
-![Terminal command](https://monosnap.com/file/HCMlSGHQPTHY68j8ZXWOEDE8WUWz9Y.png)
-
-# Note: 
-`./get_domain.rb from_company_name Guru Microsoft -c startups saas ` yields both companies with similarity index based on the common categories provided.
-However, if you want different category search for each company name. Use the file input.
-First argument `company name` and rest of the arguments can be `categories`
+![Terminal command](https://monosnap.com/file/NQ0YZhPi3Yjy8sNKRifXhvlGDevXLH.png)
 
 3) Use `help` to explore further on the options of a command. `get_domain_name` also takes `File` as parameter to parse through it and output domains.
 
 ![File option](https://monosnap.com/file/eUA9weqlJG5MdhLenkFoeXn7WMcsJB.png)
 
-![File option usage](https://monosnap.com/file/J3isNmbtE1juZuPTHVODS8BzoO62Fx.png)
+![File option usage](https://monosnap.com/file/Uy88h14YFjHhr4DRAS1bNVNSNe7ls8.png)
+
+# Note: 
+`./get_domain.rb from_company_name Guru Microsoft -c startups saas ` yields both companies with similarity index based on the common categories provided.
+However, if you want different category search for each company name. Use the file input.
+First argument `company-name` and rest of the arguments can be `categories`. Check companies.txt for example.

@@ -4,8 +4,8 @@ module Levenstein
       string1_length = string1.length
       string2_length = string2.length
 
-      return string1_length if string2_length == 0
-      return string2_length if string1_length == 0
+      return [string1_length, 0.0] if string2_length == 0
+      return [string2_length, 0.0] if string1_length == 0
 
       distance = Array.new(string1_length + 1) { Array.new(string2_length + 1) }
 
@@ -26,9 +26,9 @@ module Levenstein
       end
 
       levenstein_distance = distance[string1_length][string2_length]
-      difference_percent = levenstein_distance.fdiv(string2.size)
+      percent_difference = levenstein_distance.fdiv(string2.size)
 
-      [levenstein_distance, difference_percent]
+      [levenstein_distance, percent_difference]
     end
   end
 end

@@ -1,2 +1,3 @@
 guru saas startups
+flynn mobile ruby devops rails
 

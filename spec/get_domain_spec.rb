@@ -3,7 +3,7 @@ require_relative "../get_domain"
 describe 'GetDomain CLI class Tests' do
 
   it 'should print the correct version of the CLI' do
-    expected_version_number = "0.0.1\n"
+    expected_version_number = "0.0.2\n"
 
     expect do
       DomainSearch::GetDomain.start(['-v'])

@@ -38,7 +38,7 @@ module DomainSearch
     def from_company_name(*names)
       handle_inputs_from_file(options[:file]) if options[:file]
       company_names = *names
-      categories = options[:category] ? options[:category] : ["internet", "web", "services"]
+      categories = options[:category] ? options[:category] : ["internet", "web", "services"]  # Common tags on every website, so the Jaccard's index remains same
       handle_inputs_from_terminal(company_names, categories)
     end
 
@@ -71,10 +71,11 @@ module DomainSearch
 
       def handle_each_company_with_separate_category(input_line)
         input = input_line.chomp.split(" ")
-        search_term = input[0]
+        company_name = input[0]
         categories = input[1..-1]
-        company_objects = make_request_and_fetch_domain(search_term, categories)
-        sort_and_print_results(search_term, company_objects)
+        request_handler = SearchHelper::Request.new(company_name)
+        company_objects = request_handler.fetch_domain(categories)
+        sort_and_print_results(company_name, company_objects)
       end
 
       # Parse company name arguments upto 20 through terminal.
@@ -90,23 +91,46 @@ module DomainSearch
       #
       def print_domain_names(company_names, categories)
         company_names.each do |name|
-          company_objects = make_request_and_fetch_domain(name, categories)
+          request_handler = SearchHelper::Request.new(name)
+          company_objects = request_handler.fetch_domain(categories)
           sort_and_print_results(name, company_objects)
         end
       end
 
-      # We sort the company information according to the average of jaccard_index
-      # and percent difference we calculate through Levenstein Distance.
-      #
       def sort_and_print_results(search_term, company_objects)
-        sorted_companies = company_objects.sort_by do |company|
-                             (company.jaccard_index + company.percent_difference) / 2.0
-                           end
+        sorted_companies = sort_companies(company_objects)
+
         puts "'#{search_term}' results :"
         sorted_companies.each do |company|
           puts "Name: #{company.name}, Domain: #{company.fetched_domain}, Jaccard_index: #{company.jaccard_index}, Levenstein Distance: #{company.levenstein_distance}"
         end
         puts "=========================="
+      end
+
+      # We give preference to companies with higher jaccard's index if its present.
+      # If jaccard's index is not present i.e no category was supplied by user
+      # we display companies with least levenstein distance with search term/company name.
+      #
+      def sort_companies(companies)
+        companies_with_jaccard_index, companies_with_only_levenstein_percent = [], []
+        companies.each do |company|
+          if company.jaccard_index > 0.0
+            companies_with_jaccard_index << company
+          else
+            companies_with_only_levenstein_percent << company
+          end
+        end
+        sort_by_jaccard_index(companies_with_jaccard_index) + sort_by_levenstein_percent(companies_with_only_levenstein_percent)
+      end
+
+      # We sort in descending order for jaccard's index
+      #
+      def sort_by_jaccard_index(companies)
+        companies.sort_by { |company| company.jaccard_index }.reverse
+      end
+
+      def sort_by_levenstein_percent(companies)
+        companies.sort_by { |company| company.levenstein_percent }
       end
 
       def suggest_file_input_for_more_inputs
