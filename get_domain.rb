@@ -1,6 +1,5 @@
 #!/usr/bin/env ruby
 require "thor"
-require "httparty"
 
 require_relative "lib/search_helper"
 
@@ -38,7 +37,7 @@ module DomainSearch
     def from_company_name(*names)
       handle_inputs_from_file(options[:file]) if options[:file]
       company_names = *names
-      categories = options[:category] ? options[:category] : ["internet", "web", "services"]  # Common tags on every website, so the Jaccard's index remains same
+      categories = options[:category] if options[:category]
       handle_inputs_from_terminal(company_names, categories)
     end
 
@@ -82,14 +81,14 @@ module DomainSearch
       # Suggest the User to pass file as argument and make them aware of -f or --file
       # option.
       #
-      def handle_inputs_from_terminal(company_names, categories)
+      def handle_inputs_from_terminal(company_names, categories = nil)
         return suggest_file_input_for_more_inputs if company_names.size > 20
         print_domain_names(company_names, categories)
       end
 
       # Process array of company names as input and yield result to STDOUT.
       #
-      def print_domain_names(company_names, categories)
+      def print_domain_names(company_names, categories = nil)
         company_names.each do |name|
           request_handler = SearchHelper::Request.new(name)
           company_objects = request_handler.fetch_domain(categories)
@@ -102,7 +101,7 @@ module DomainSearch
 
         puts "'#{search_term}' results :"
         sorted_companies.each do |company|
-          puts "Name: #{company.name}, Domain: #{company.fetched_domain}, Jaccard_index: #{company.jaccard_index}, Levenstein Distance: #{company.levenstein_distance}"
+          puts "Domain: #{company.fetched_domain}, Score: #{company.score}"
         end
         puts "=========================="
       end
@@ -112,25 +111,9 @@ module DomainSearch
       # we display companies with least levenstein distance with search term/company name.
       #
       def sort_companies(companies)
-        companies_with_jaccard_index, companies_with_only_levenstein_percent = [], []
-        companies.each do |company|
-          if company.jaccard_index > 0.0
-            companies_with_jaccard_index << company
-          else
-            companies_with_only_levenstein_percent << company
-          end
-        end
-        sort_by_jaccard_index(companies_with_jaccard_index) + sort_by_levenstein_percent(companies_with_only_levenstein_percent)
-      end
-
-      # We sort in descending order for jaccard's index
-      #
-      def sort_by_jaccard_index(companies)
-        companies.sort_by { |company| company.jaccard_index }.reverse
-      end
-
-      def sort_by_levenstein_percent(companies)
-        companies.sort_by { |company| company.levenstein_percent }
+        companies.sort_by do |company|
+          company.score
+        end.reverse
       end
 
       def suggest_file_input_for_more_inputs

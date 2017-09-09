@@ -1,7 +1,8 @@
+require 'parallel'
+require 'httparty'
+
 require_relative 'secret'
 require_relative 'company/company'
-
-require 'parallel'
 
 module SearchHelper
   class Request
@@ -16,8 +17,8 @@ module SearchHelper
     # Fetches all similar domains from APIs and retrieves tags on them, compares their relevance
     # and outputs the company objects with all relevant information.
     #
-    def fetch_domain(attributes)
-      attributes = attributes.map(&:downcase)
+    def fetch_domain(attributes = nil)
+      attributes = attributes.map(&:downcase) if attributes
 
       companies = get_domains_from_name(attributes)
       companies
@@ -26,11 +27,11 @@ module SearchHelper
     # Fetches all similar domain from Google and Clearbit in parallel processes.
     # Creates company profile with jaccard index to calculate similarity with respect to tags & category
     #
-    def get_domains_from_name(attributes)
+    def get_domains_from_name(attributes = nil)
       all_domains = fetch_domains_in_parallel.flatten
       all_similar_domains = (all_domains).uniq
-      company_objects = SearchHelper::ProcessSimilarity.create_company_profiles(all_similar_domains)
-      SearchHelper::ProcessSimilarity.calculate_similarity(company_objects, name, attributes)
+      company_objects = SearchHelper::ProcessSimilarity.create_company_profiles(all_similar_domains, attributes, name)
+      company_objects
     end
 
     def fetch_domains_in_parallel
@@ -60,7 +61,7 @@ module SearchHelper
     # first few items before we stumble upon the correct domain.
     #
     def fetch_domain_names_from_google
-      query_params = { key: GOOGLE_API_KEY, q: name, num: 7, safe: "high", cx: GOOGLE_CUSTOM_SEARCH_ID }
+      query_params = { key: GOOGLE_API_KEY, q: name, num: 15, safe: "high", cx: GOOGLE_CUSTOM_SEARCH_ID }
       response = HTTParty.get(GOOGLE_SEARCH_API, query: query_params)
       if response.success?
         response = JSON(response.body)
@@ -105,35 +106,15 @@ module SearchHelper
       # FullContact returns tags such as ["Mobile", "Devops", "Recruiting"]. We use this tags
       # for similarity comparison with user's categories.
       #
-      def create_company_profiles(domains)
+      def create_company_profiles(domains, attributes = nil, search_term = "")
         raise "No domains found from APIs, check rate limits" if domains.empty?
         company_objects = []
-        domains.each do |domain|
-          company_information = get_company_info_from_fullcontact(domain)
-          organization_info = company_information["organization"]
-          company_objects << Company.new(organization_info["name"], domain, organization_info["keywords"])
+        Parallel.each(domains, in_threads: 3, progress: "Assigning scores") do |domain|
+          company = Company.new(domain, attributes)
+          company.calculate_similarity(search_term) rescue nil
+          company_objects << company
         end
         company_objects
-      end
-
-      # Assigns similarity values like levenstein distance and jaccard's index in this block
-      #
-      def calculate_similarity(company_objects, name, attributes)
-        company_objects.each do |company|
-          company.assign_category_jaccard_index(attributes)
-          company.calculate_levenstein_distance(name)
-        end
-        company_objects
-      end
-
-      # Gets information from FullContact's lookup by domain API for companies.
-      #
-      def get_company_info_from_fullcontact(domain = "")
-        response = HTTParty.get(FULLCONTACT_LOOKUP_API, query: { "domain" => domain,
-                                                                 "apiKey" => FULLCONTACT_API_KEY })
-        response = response.success? ? JSON(response.body) : raise("Could not get information from FullContact, check rate limit.")
-        raise "FullContact retry error" if response["status"] == 202 # FullContact queues for search sometimes.
-        response
       end
 
     end

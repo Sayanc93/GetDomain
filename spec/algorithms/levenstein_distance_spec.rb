@@ -7,19 +7,19 @@ describe 'Levenstein Distance module tests' do
   end
 
   it 'should print the correct levenstein distance for test strings' do
-    expect(Levenstein::Distance.generate(@string1, @string2)).to eq([5, 1.25])
+    expect(Levenstein::Distance.generate(@string1, @string2)).to eq(5)
   end
 
   it 'should print the correct levenstein distance when 2 strings are equal' do
     string3 = "guru"
 
-    expect(Levenstein::Distance.generate(@string2, string3)).to eq([0, 0.0])
+    expect(Levenstein::Distance.generate(@string2, string3)).to eq(0)
   end
 
   it 'should print the correct levenstein distance when one of the string is empty' do
     string3 = ""
 
-    expect(Levenstein::Distance.generate(@string2, string3)).to eq([4, 0.0])
+    expect(Levenstein::Distance.generate(@string2, string3)).to eq(4)
   end
 
 end

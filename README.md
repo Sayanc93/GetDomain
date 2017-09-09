@@ -15,6 +15,14 @@ A Simple Ruby CLI built on top of Thor to fetch domains accurately from company 
 
     Run `gem install parallel` to install it before running the tool.
 
+* **Mechanize**: Ruby gem built on top of Nokogiri for Web Scraping.
+
+    Run `gem install mechanize` to install it before running the tool.
+
+* **Koala**: Koala is a Facebook library for Ruby, supporting the Graph API/
+
+    Run `gem install koala` to install it before running the tool.
+
 * **HTTParty**: HTTparty is a simple and efficient tool to handle HTTP requests.
 
     Run `gem install httparty` to install it before running the tool.
@@ -47,7 +55,7 @@ commands can be typed in.
     SplitanAtom => `valid`
 
 ```ruby
-./get_domain.rb from_company_name Guru -c startups saas 
+./get_domain.rb from_company_name Guru -c startups saas
 ```
 ![Terminal command](https://monosnap.com/file/NQ0YZhPi3Yjy8sNKRifXhvlGDevXLH.png)
 
@@ -57,7 +65,7 @@ commands can be typed in.
 
 ![File option usage](https://monosnap.com/file/Uy88h14YFjHhr4DRAS1bNVNSNe7ls8.png)
 
-# Note: 
+# Note:
 `./get_domain.rb from_company_name Guru Microsoft -c startups saas ` yields both companies with similarity index based on the common categories provided.
 However, if you want different category search for each company name. Use the file input.
 First argument `company-name` and rest of the arguments can be `categories`. Check companies.txt for example.
